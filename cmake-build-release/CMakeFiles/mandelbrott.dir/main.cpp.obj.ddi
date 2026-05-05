@@ -1,0 +1,13 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "CMakeFiles\\mandelbrott.dir\\main.cpp.obj",
+            "outputs": [
+                "CMakeFiles\\mandelbrott.dir\\main.cpp.obj.ddi"
+            ],
+            "requires": []
+        }
+    ]
+}
