@@ -14,16 +14,18 @@ vec2 zsquare(vec2 z){
     return vec2(z.x * z.x-z.y*z.y, 2*z.x*z.y);
 }
 float color(vec2 xy){
-    float col = 0;
+    int iter = 0;
     vec2 z = xy;
     for (int i = 0; i < maxIterations; i++){
         z = zsquare(z)+xy;
         if(length(z)>2){
             break;
         }
-        col += 1/float(maxIterations);
+        iter += 1;
     }
-    return col;
+    if (iter == maxIterations) return 1.;
+    float dc = log(log(z.x*z.x + z.y*z.y) * 0.5 / log(2.)) / log(2.);
+    return (float(iter) + 1. - dc)/float(maxIterations);
 }
 void main()
 {
@@ -74,12 +76,13 @@ void main()
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
             float di = dMousePos.y / window.getSize().x * 1000;
             iterations = static_cast<int>(static_cast<float>(iterations) + di);
-            //std::cout << "Iterations: " << iterations << std::endl;
+            std::cout << "Iterations: " << iterations << std::endl;
             if (iterations < 1) {
                 iterations = 1;
             }
         }
         oldMousePos = mousePos;
+        window.setTitle("Mandelbrot's set by Alexandr Georgiev.     Iterations: " + std::to_string(iterations)+"    Center: " + std::to_string(center_pos.x) + " " + std::to_string(center_pos.y));
 
         window.clear(sf::Color::Black);
         sf::Image image(window.getSize(), sf::Color::Black);
