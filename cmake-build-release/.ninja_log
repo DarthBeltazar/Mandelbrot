@@ -1,8 +1,0 @@
-# ninja log v6
-3	133	8000516663968845	CMakeFiles/mandelbrott.dir/main.cpp.obj.ddi	8d6fc728b572d806
-5	32	8011554964677434	CMakeFiles/mandelbrott.dir/main.cpp.obj.modmap	86960093a50e85ec
-5	32	8011554964677434	CMakeFiles/mandelbrott.dir/CXX.dd	86960093a50e85ec
-1528	1962	8000516679216517	mandelbrott.exe	af6fb8cb61fa03a7
-5	32	8011554964677434	C:/Users/AlexandrGeorgiev/CLionProjects/mandelbrott/cmake-build-release/CMakeFiles/mandelbrott.dir/CXXModules.json	86960093a50e85ec
-165	1528	8000516665591229	CMakeFiles/mandelbrott.dir/main.cpp.obj	b37bb43177bad176
-6	1148	8030016477787107	build.ninja	fa2897e46eeef996

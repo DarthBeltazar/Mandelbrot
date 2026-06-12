@@ -1,3 +1,0 @@
-C:/Users/AlexandrGeorgiev/CLionProjects/mandelbrott/cmake-build-release/CMakeFiles/mandelbrott.dir
-C:/Users/AlexandrGeorgiev/CLionProjects/mandelbrott/cmake-build-release/CMakeFiles/edit_cache.dir
-C:/Users/AlexandrGeorgiev/CLionProjects/mandelbrott/cmake-build-release/CMakeFiles/rebuild_cache.dir
