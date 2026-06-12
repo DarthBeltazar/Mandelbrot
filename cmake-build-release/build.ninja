@@ -54,7 +54,7 @@ build CMakeFiles\mandelbrott.dir\main.cpp.obj.ddi: CXX_SCAN__mandelbrott_Release
   DEP_FILE = CMakeFiles\mandelbrott.dir\main.cpp.obj.ddi.d
   DYNDEP_INTERMEDIATE_FILE = CMakeFiles\mandelbrott.dir\main.cpp.obj.ddi
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++latest -MD
-  INCLUDES = -external:IC:\SFML\SFML-3.0.2\include -external:W0
+  INCLUDES = -IC:\Users\AlexandrGeorgiev\CLionProjects\mandelbrott\.\SFML-3.0.2\include -external:IC:\SFML\SFML-3.0.2\include -external:W0
   OBJ_FILE = CMakeFiles\mandelbrott.dir\main.cpp.obj
   PREPROCESSED_OUTPUT_FILE = CMakeFiles\mandelbrott.dir\main.cpp.obj.ddi.i
 
@@ -62,7 +62,7 @@ build CMakeFiles\mandelbrott.dir\main.cpp.obj: CXX_COMPILER__mandelbrott_scanned
   DEFINES = -DSFML_STATIC
   DYNDEP_MODULE_MAP_FILE = CMakeFiles\mandelbrott.dir\main.cpp.obj.modmap
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++latest -MD
-  INCLUDES = -external:IC:\SFML\SFML-3.0.2\include -external:W0
+  INCLUDES = -IC:\Users\AlexandrGeorgiev\CLionProjects\mandelbrott\.\SFML-3.0.2\include -external:IC:\SFML\SFML-3.0.2\include -external:W0
   OBJECT_DIR = CMakeFiles\mandelbrott.dir
   OBJECT_FILE_DIR = CMakeFiles\mandelbrott.dir
   TARGET_COMPILE_PDB = CMakeFiles\mandelbrott.dir\

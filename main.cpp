@@ -43,6 +43,7 @@ void main()
     sf::View view = window.getView();
 
     float mws_sens = 1;
+    float iterSens = 0.005;
     int iterations = 100;
     float scale = 3.f;
 
@@ -75,10 +76,13 @@ void main()
         }
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
             float di = dMousePos.y / window.getSize().x * 1000;
-            iterations = static_cast<int>(static_cast<float>(iterations) + di);
+            iterations = static_cast<int>(static_cast<float>(iterations+50)*(1+di*iterSens)-50);
             std::cout << "Iterations: " << iterations << std::endl;
             if (iterations < 1) {
                 iterations = 1;
+            }
+            if (iterations > 1000000) {
+                iterations = 1000000;
             }
         }
         oldMousePos = mousePos;
