@@ -3,21 +3,8 @@ project(mandelbrott)
 
 set(CMAKE_CXX_STANDARD 26)
 
-set(SFML_BUILD_EXAMPLES OFF CACHE INTERNAL "")
-set(SFML_BUILD_DOC OFF CACHE INTERNAL "")
-
-include(FetchContent)
-
-FetchContent_Declare(
-        SFML
-        GIT_REPOSITORY "https://github.com/SFML/SFML.git"
-        GIT_TAG        "3.0.2"
-        TLS_VERIFY     OFF
-)
-FetchContent_MakeAvailable(SFML)
+find_package(SFML 3 COMPONENTS System Window Graphics Audio Network REQUIRED)
 
 add_executable(mandelbrott main.cpp)
 
-# В режиме FetchContent библиотеки собираются прямо внутри проекта
-# Поэтому линкуем их БЕЗ двоеточий (sfml-graphics вместо SFML::Graphics)
-target_link_libraries(mandelbrott PRIVATE sfml-graphics sfml-audio sfml-network)
+target_link_libraries(mandelbrott PRIVATE SFML::Graphics SFML::Audio SFML::Network)
