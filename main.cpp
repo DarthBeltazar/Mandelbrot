@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+
 int main() {
     sf::Shader shader;
     constexpr std::string_view fragmentShader = R"(
@@ -51,33 +52,44 @@ void main()
     sf::Vector2i oldMousePos(0, 0);
 
 
-    while (window.isOpen())
-    {
-        while (const std::optional event = window.pollEvent())
-        {
+    while (window.isOpen()) {
+        while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>())
                 window.close();
-            if (const auto* resized = event->getIf<sf::Event::Resized>())
-            {
+            if (const auto *resized = event->getIf<sf::Event::Resized>()) {
                 // update the view to the new size of the window
                 sf::FloatRect visibleArea({0.f, 0.f}, sf::Vector2f(resized->size));
                 window.setView(sf::View(visibleArea));
-            }
-            else if(const auto* wheelMoved = event->getIf<sf::Event::MouseWheelScrolled>())
-            {
-                scale -= wheelMoved->delta*scale*0.1f*mws_sens;
+            } else if (const auto *wheelMoved = event->getIf<sf::Event::MouseWheelScrolled>()) {
+                sf::Vector2f mousePosFloat(static_cast<float>(wheelMoved->position.x),
+                                           static_cast<float>(wheelMoved->position.y));
+                sf::Vector2f windowSize(static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y));
+
+                sf::Vector2f uv = mousePosFloat.componentWiseDiv(windowSize) - sf::Vector2f(0.5f, 0.5f);
+
+                float aspect = windowSize.x / windowSize.y;
+                uv.x *= aspect;
+
+                sf::Vector2f mouseWorldBefore = uv * scale + center_pos;
+
+                float zoomFactor = 1.0f - wheelMoved->delta * 0.1f * mws_sens;
+                scale *= zoomFactor;
+
+                sf::Vector2f mouseWorldAfter = uv * scale + center_pos;
+
+                center_pos += (mouseWorldBefore - mouseWorldAfter);
             }
         }
 
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
         sf::Vector2f dMousePos = sf::Vector2f(mousePos) - sf::Vector2f(oldMousePos);
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-            center_pos -= sf::Vector2f(dMousePos.x * scale / window.getSize().y, dMousePos.y * scale / window.getSize().y);
+            center_pos -= sf::Vector2f(dMousePos.x * scale / window.getSize().y,
+                                       dMousePos.y * scale / window.getSize().y);
         }
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
             float di = dMousePos.y / window.getSize().x * 1000;
-            iterations = static_cast<int>(static_cast<float>(iterations+50)*(1+di*iterSens)-50);
-            std::cout << "Iterations: " << iterations << std::endl;
+            iterations = static_cast<int>(static_cast<float>(iterations + 50) * (1 + di * iterSens) - 50);
             if (iterations < 1) {
                 iterations = 1;
             }
@@ -86,7 +98,9 @@ void main()
             }
         }
         oldMousePos = mousePos;
-        window.setTitle("Mandelbrot's set by Alexandr Georgiev.     Iterations: " + std::to_string(iterations)+"    Center: " + std::to_string(center_pos.x) + " " + std::to_string(center_pos.y));
+        window.setTitle(
+            "Mandelbrot's set by Alexandr Georgiev.     Iterations: " + std::to_string(iterations) + "    Center: " +
+            std::to_string(center_pos.x) + " " + std::to_string(center_pos.y));
 
         window.clear(sf::Color::Black);
         sf::Image image(window.getSize(), sf::Color::Black);
