@@ -1,10 +1,11 @@
-name: Multiplatform Build (vcpkg)
+name: Multiplatform Build & Prerelease (vcpkg)
 
 on:
   push:
     branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -16,34 +17,89 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Install Linux Graphic Dependencies
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev \
-            libudev-dev libopenal-dev libflac-dev libvorbis-dev \
-            libgl1-mesa-dev libegl1-mesa-dev xorg-dev
+    - name: Install Linux Graphic Dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev \
+          libudev-dev libopenal-dev libflac-dev libvorbis-dev \
+          libgl1-mesa-dev libegl1-mesa-dev xorg-dev ninja-build
 
-      - name: Setup GitHub Actions Cache for vcpkg
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/build/vcpkg_installed
-            ~/.cache/vcpkg
-          key: ${{ matrix.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ matrix.os }}-vcpkg-
+    - name: Setup GitHub Actions Cache for vcpkg
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/build/vcpkg_installed
+          ~/.cache/vcpkg
+        key: ${{ matrix.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          ${{ matrix.os }}-vcpkg-
 
-      - name: Configure CMake
-        shell: bash
-        run: |
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
-            -DVCPKG_USE_LATEST_BASELINE=ON
+    - name: Configure CMake
+      shell: bash
+      run: |
+        cd "$VCPKG_INSTALLATION_ROOT"
+        VCPKG_COMMIT=$(git rev-parse HEAD)
+        cd "$GITHUB_WORKSPACE"
+        
+        cmake -B build -G "Ninja" \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
+          -DVCPKG_TARGET_TRIPLET="${{ matrix.os == 'windows-latest' && 'x64-windows' || (matrix.os == 'macos-latest' && 'arm64-osx' || 'x64-linux') }}" \
+          "-D_VCPKG_MANIFEST_BASELINE=$VCPKG_COMMIT"
 
-      - name: Build Project
-        run: cmake --build build --config Release
+    - name: Build Project
+      run: cmake --build build --config Release
+
+    - name: Package Artifacts
+      shell: bash
+      run: |
+        mkdir -p dist
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          # На Windows исполняемый файл имеет расширение .exe
+          cp build/mandelbrott.exe dist/mandelbrot-windows.exe
+        elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+          cp build/mandelbrott dist/mandelbrot-macos-arm64
+        else
+          cp build/mandelbrott dist/mandelbrot-linux-x64
+        fi
+
+    - name: Upload Artifacts to Workflow
+      uses: actions/upload-artifact@v4
+      with:
+        name: mandelbrot-${{ matrix.os }}
+        path: dist/*
+        retention-days: 1
+
+  create-prerelease:
+    name: Create Pre-Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: all-artifacts
+        merge-multiple: true
+
+    - name: Release App
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: "v3.0-prerelease"
+        name: "Mandelbrot Automated Pre-release"
+        body: |
+          Автоматическая сборка множества Мандельброта.
+          Скомпилировано с использованием CMake, SFML 3 и vcpkg.
+          Последнее обновление: ${{ github.event.head_commit.message }}
+        prerelease: true
+        draft: false
+        files: all-artifacts/*
+        fail_on_unmatched_files: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
