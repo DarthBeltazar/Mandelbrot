@@ -45,11 +45,24 @@ jobs:
         VCPKG_COMMIT=$(git rev-parse HEAD)
         cd "$GITHUB_WORKSPACE"
         
-        cmake -B build -G "Ninja" \
+        # Определяем генератор: для Windows — Visual Studio, для остальных — Ninja
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          GENERATOR_FLAG="" # Оставляем дефолтный для Windows (Visual Studio)
+          TRIPLET="x64-windows"
+        elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+          GENERATOR_FLAG="-G Ninja"
+          TRIPLET="arm64-osx"
+        else
+          GENERATOR_FLAG="-G Ninja"
+          TRIPLET="x64-linux"
+        fi
+        
+        cmake -B build $GENERATOR_FLAG \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -DVCPKG_TARGET_TRIPLET="${{ matrix.os == 'windows-latest' && 'x64-windows' || (matrix.os == 'macos-latest' && 'arm64-osx' || 'x64-linux') }}" \
+          -DVCPKG_TARGET_TRIPLET="$TRIPLET" \
           "-D_VCPKG_MANIFEST_BASELINE=$VCPKG_COMMIT"
+
 
     - name: Build Project
       run: cmake --build build --config Release
