@@ -71,14 +71,21 @@ jobs:
       shell: bash
       run: |
         mkdir -p dist
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          # На Windows исполняемый файл имеет расширение .exe
-          cp build/mandelbrott.exe dist/mandelbrot-windows.exe
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            mkdir -p dist/mandelbrot-windows
+            cp build/Release/mandelbrott.exe dist/mandelbrot-windows/mandelbrot.exe
+            cp build/Release/*.dll dist/mandelbrot-windows/ 2>/dev/null || true
+          
+            cd dist
+            7z a mandelbrot-windows.zip mandelbrot-windows/
+            rm -rf mandelbrot-windows
+            cd ..
         elif [ "${{ matrix.os }}" = "macos-latest" ]; then
           cp build/mandelbrott dist/mandelbrot-macos-arm64
         else
           cp build/mandelbrott dist/mandelbrot-linux-x64
         fi
+
 
     - name: Upload Artifacts to Workflow
       uses: actions/upload-artifact@v4
