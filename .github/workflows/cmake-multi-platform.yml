@@ -45,9 +45,8 @@ jobs:
         VCPKG_COMMIT=$(git rev-parse HEAD)
         cd "$GITHUB_WORKSPACE"
         
-        # Определяем генератор: для Windows — Visual Studio, для остальных — Ninja
         if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          GENERATOR_FLAG="" # Оставляем дефолтный для Windows (Visual Studio)
+          GENERATOR_FLAG=""
           TRIPLET="x64-windows"
         elif [ "${{ matrix.os }}" = "macos-latest" ]; then
           GENERATOR_FLAG="-G Ninja"
@@ -114,9 +113,9 @@ jobs:
         tag_name: "v3.0-prerelease"
         name: "Mandelbrot Automated Pre-release"
         body: |
-          Автоматическая сборка множества Мандельброта.
-          Скомпилировано с использованием CMake, SFML 3 и vcpkg.
-          Последнее обновление: ${{ github.event.head_commit.message }}
+          Automatically build.
+          Compiled with CMake, SFML 3 и vcpkg.
+          Last commit: ${{ github.event.head_commit.message }}
         prerelease: true
         draft: false
         files: all-artifacts/*
