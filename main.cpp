@@ -39,7 +39,11 @@ void main()
 }
 
 )";
-    shader.loadFromMemory(fragmentShader, sf::Shader::Type::Fragment);
+    if (!shader.loadFromMemory(fragmentShader, sf::Shader::Type::Fragment)) {
+        std::cerr << "Failed to load fragment shader!" << std::endl;
+        return -1;
+    }
+
     sf::RenderWindow window(sf::VideoMode({800, 600}), "Mandelbrot's set by Alexandr Georgiev");
     sf::View view = window.getView();
 
