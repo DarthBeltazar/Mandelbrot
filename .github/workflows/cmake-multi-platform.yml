@@ -27,16 +27,25 @@ jobs:
             libudev-dev libopenal-dev libflac-dev libvorbis-dev \
             libgl1-mesa-dev libegl1-mesa-dev xorg-dev
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
+      - name: Setup GitHub Actions Cache for vcpkg
+        uses: actions/cache@v4
         with:
-          vcpkgJsonGlob: 'vcpkg.json'
+          path: |
+            ${{ github.workspace }}/build/vcpkg_installed
+            ~/.cache/vcpkg
+            appdata/Local/vcpkg/archives
+          key: ${{ matrix.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ matrix.os }}-vcpkg-
+
+      - name: Integrates vcpkg
+        uses: microsoft/vcpkg-actions@v1
 
       - name: Configure CMake
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+            -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_INSTALLATION_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
       - name: Build Project
         run: cmake --build build --config Release
