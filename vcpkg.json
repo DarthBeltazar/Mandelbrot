@@ -1,7 +1,7 @@
 {
   "name": "mandelbrott",
   "version-string": "1.0.0",
-  "builtin-baseline": "23a1a3615f2066fa5fa2a4f483bf9f928e19c3c1",
+  "builtin-baseline": "0000000000000000000000000000000000000000",
   "dependencies": [
     "sfml"
   ]
